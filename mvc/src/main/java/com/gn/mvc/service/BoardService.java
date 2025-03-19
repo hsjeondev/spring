@@ -31,6 +31,7 @@ public class BoardService {
 	
 	private final BoardRepository repository;
 	private final AttachRepository attachRepository;
+	private final AttachService attachService;
 	private Logger logger = LoggerFactory.getLogger(BoardController.class);	
 	
 	public int deleteBoardOne(Long id) {
@@ -47,15 +48,46 @@ public class BoardService {
 		return result;
 	}
 	
-	public BoardDto updateBoardOne(BoardDto param) {
+	@Transactional(rollbackFor = Exception.class)
+	public Board updateBoard(BoardDto param, List<AttachDto> attachDtoList) {
 		Board result = null;
-		// 1. @Id를 쓴 필드를 기준으로 타겟 조회
-		Board target = repository.findById(param.getBoard_no()).orElse(null);
-		// 2. 타겟이 존재하는 경우 업데이트
-		if(target != null) {
-			result = repository.save(param.toEntity());
+		try {
+			// 1. @Id를 쓴 필드를 기준으로 타겟 조회
+			Board target = repository.findById(param.getBoard_no()).orElse(null);
+			// 2. 타겟이 존재하는 경우 업데이트
+			if(target != null) {
+				// 3. 파일이 존재하는 경우
+				if(param.getDelete_files() != null && !param.getDelete_files().isEmpty()) {
+//					for(Long attach_no : param.getDelete_files()) {
+//						// (1) db에서 메타 데이터 삭제
+//						if(attachService.deleteMetaData(attach_no) > 0) {
+//							// (2) 메모리에서 파일 자체 삭제
+//							attachService.deleteFileData(attach_no);
+//						}
+//					}
+					for(Long attach_no : param.getDelete_files()) {
+						// (1) db에서 메타 데이터 삭제
+						String path = attachService.deleteMetaData(attach_no);
+						if(path != null) {
+							attachService.deleteFileData(path);
+						}
+					}
+				}
+				if(attachDtoList.size() != 0) {
+					for(AttachDto attachDto : attachDtoList) {
+						attachDto.setBoard_no(param.getBoard_no());
+						Attach attach = attachDto.toEntity();
+						attachRepository.save(attach);
+					}
+				}
+				
+				
+				result = repository.save(param.toEntity());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		return new BoardDto().toDto(result);
+		return result;
 		
 	}
 	

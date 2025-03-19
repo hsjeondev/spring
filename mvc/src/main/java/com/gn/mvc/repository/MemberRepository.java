@@ -6,4 +6,5 @@ import com.gn.mvc.entity.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
+	Member findBymemberId(String keyword);
 }

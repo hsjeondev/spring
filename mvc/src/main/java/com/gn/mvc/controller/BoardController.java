@@ -84,12 +84,10 @@ public class BoardController {
 			if(attachDto != null) attachDtoList.add(attachDto);
 		}
 		
-		if(dto.getFiles().size() == attachDtoList.size()) {
-			int result = service.createBoard(dto, attachDtoList);
-			if(result > 0) {
-				resultMap.put("res_code", "200");
-				resultMap.put("res_msg", "게시글이 등록되었습니다.");
-			}
+		int result = service.createBoard(dto, attachDtoList);
+		if(result > 0) {
+			resultMap.put("res_code", "200");
+			resultMap.put("res_msg", "게시글이 등록되었습니다.");
 		}
 		
 		// Service가 가지고 있는 createBoard 메소드 호출
@@ -135,24 +133,31 @@ public class BoardController {
 		return "board/update";
 	}
 	
+	// 여기 질문
 	@PostMapping("/board/{id}/update")
 	@ResponseBody
-	public Map<String, String> updateBoardApi(BoardDto param, Model model) {
-		logger.info("삭제 파일 정보 : " + param.getDelete_files());
+	public Map<String, String> updateBoardApi(BoardDto param) {
 //		// 1. BoardDto 출력
 //		logger.info("수정할 게시글 정보 : " + param);
 //		// 2. BoardService -> BoardRepository 게시글 수정
 		Map<String, String> resultMap = new HashMap<String, String>();
-//		resultMap.put("res_code", "500");
-//		resultMap.put("res_msg", "수정 중 오류가 발생하였습니다.");
-//		
-//		BoardDto result = service.updateBoardOne(param);
-//		logger.info("수정된 게시물 : " + result);
-//		// 3. 수정 결과 Entity가 null이 아니면 성공 그외에는 실패
-//		if(result != null) {
-//			resultMap.put("res_code", "200");
-//			resultMap.put("res_msg", "게시글 수정이 정상적으로 완료되었습니다.");
-//		}
+		resultMap.put("res_code", "500");
+		resultMap.put("res_msg", "수정 중 오류가 발생하였습니다.");
+		
+		List<AttachDto> attachDtoList = new ArrayList<AttachDto>();
+		
+		for(MultipartFile mf : param.getFiles()) {
+			AttachDto attachDto = attachService.uploadFile(mf);
+			if(attachDto != null) attachDtoList.add(attachDto);
+		}
+		
+		Board result = service.updateBoard(param, attachDtoList);
+		
+		// 3. 수정 결과 Entity가 null이 아니면 성공 그외에는 실패
+		if(result != null) {
+			resultMap.put("res_code", "200");
+			resultMap.put("res_msg", "게시글 수정이 정상적으로 완료되었습니다.");
+		}
 		return resultMap;
 	}
 	

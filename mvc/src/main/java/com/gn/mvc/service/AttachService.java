@@ -28,6 +28,44 @@ public class AttachService {
 	private final BoardRepository boardRepository;
 	private final AttachRepository attachRepository;
 	
+	// 파일 메타 데이터 삭제
+	public String deleteMetaData(Long attach_no) {
+		String result = null;
+		
+		try {
+			// 삭제 중 발생할 수 있는 오류를 방지하기 위해 먼저 조회하는 것을 지향
+			Attach target = attachRepository.findById(attach_no).orElse(null);
+			if(target != null) {
+				// JPA는 엔티티를 기준으로 삭제하기를 지향
+				attachRepository.delete(target);
+				result = target.getAttachPath();
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	// 파일 자체 메모리에서 삭제
+	public int deleteFileData(String path) {
+		int result = 0;
+		try {
+//			Attach attach = attachRepository.findById(attach_path).orElse(null);
+			if(path != null) {
+				File file = new File(path);
+				// 파일이 존재하면 삭제
+				if(file.exists()) {
+					file.delete();
+				}
+			}
+			result = 1;
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
 	public Attach selectAttachOne(Long id) {
 		return attachRepository.findById(id).orElse(null);
 	}
