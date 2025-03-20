@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	<th:block th:fragment="navLayout">
 		<link th:href="@{/css/include/nav.css}" rel="stylesheet">
 		<link th:href="@{/css/include/common.css}" rel="stylesheet">
@@ -7,18 +8,58 @@
 			<div id="nav_wrap">
 				<div class="menu">
 					<ul>
-						<li>
-							<a th:href="@{/board}">게시판</a>
-						</li>
-						<li>
-							<a href="@{/login}">로그인</a>
-						</li>
-						<li>
-							<a th:href="@{/signup}">회원가입</a>
-						</li>
+						<th:block sec:authorize="isAnonymous()">
+							<li>
+								<a href="@{/login}">로그인</a>
+							</li>
+							<li>
+								<a th:href="@{/signup}">회원가입</a>
+							</li>
+						</th:block>
+						<th:block sec:authorize="isAuthenticated()">
+							<li>
+								<form th:action="@{/logout}" method="post">
+									<input type="submit" value="로그아웃">
+								</form>
+							</li>
+							<li>
+								<a th:href="@{/board}">게시판</a>
+							</li>
+							<li>
+								<a th:href="@{/member/{memberNo}/update(memberNo=${#authentication.principal.member.memberNo})}">
+									회원 수정
+								</a>
+							</li>
+							<li>
+									<a th:onclick="|javascript:memberDelete(${#authentication.principal.member.memberNo})|">회원 탈퇴</a>
+							</li>
+						</th:block>
 					</ul>
 				</div>
 			</div>
 		</nav>
+		<script>
+			const memberDelete = function(id) {
+				if(confirm("정말 탈퇴하시겠습니까?")) {
+					fetch("/member/"+id, {
+						method : 'delete',
+						headers: {
+				              'header': document.querySelector('meta[name="_csrf_header"]').content,
+				              'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+						}
+					})
+					.then(response => response.json())
+					.then(data => {
+						alert(data.res_msg);
+						if(data.res_code == "200") {
+							location.href = "/";
+						}
+					})
+					.catch(error => {
+						alert(error);
+					})	
+				}
+			}
+		</script>
 	</th:block>
 </html>

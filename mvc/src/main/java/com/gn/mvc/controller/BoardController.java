@@ -164,7 +164,6 @@ public class BoardController {
 	@DeleteMapping("/board/{id}")
 	@ResponseBody
 	public Map<String, String> deleteBoardApi(@PathVariable("id") Long id) {
-		logger.info("와줬으면 좋겠어" + id);
 		
 		Map<String, String> resultMap = new HashMap<String, String>();
 		
