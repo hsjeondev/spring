@@ -25,6 +25,7 @@ public class MemberDto {
 	private String member_name;
 	private LocalDateTime reg_date;
 	private LocalDateTime mod_date;
+	private String member_role;
 	
 	public Member toEntity() {
 		return Member.builder()
@@ -32,6 +33,7 @@ public class MemberDto {
 				.memberId(member_id)
 				.memberPw(member_pw)
 				.memberName(member_name)
+				.memberRole(member_role)
 				.build();
 	}
 	
