@@ -25,17 +25,14 @@ public class ChatRoomService {
 		return chatRoom;
 	}
 
-	public List<ChatRoom> selectChatRoomAll() {
-		
-		Authentication authentication
-			= SecurityContextHolder.getContext().getAuthentication();
+	public List<ChatRoom> selectChatRoomAll(){
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		
 		MemberDetails md = (MemberDetails)authentication.getPrincipal();
-		
 		Specification<ChatRoom> spec = (root, query, criteriaBuilder) -> null;
 		spec = spec.and(ChatRoomSpecification.fromMemberEquals(md.getMember()));
 		spec = spec.or(ChatRoomSpecification.toMemberEquals(md.getMember()));
-	
+		
 		List<ChatRoom> list = repository.findAll(spec);
 		return list;
 	}
