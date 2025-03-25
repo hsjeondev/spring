@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h1>할 일 목록</h1>
+	<br>
+	<form action="/" name="search_todo_content_form" method="get">
+		<label for="search_content">내용 :</label>
+		<input name="search_text" type="text" id="search_content" th:value="${searchDto.search_text}">
+		<button	type="submit">검색</button>
+	</form>
+	<br>
+	<table border="1">
+		<thead>
+			<tr>
+				<th>완료</th>
+				<th>번호</th>
+				<th>내용</th>
+				<th>삭제</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:if="${todos == null}">
+				<td colspan="4">조회된 데이터가 없습니다</td>
+			</tr>
+			<tr th:if="${todos != null}"
+				th:each="todo, todoStatus : ${todos}">
+				<td><input type="checkbox" th:checked="${todo.flag == 'Y'}" th:onchange="|javascript:changeFlag('${todo.no}')|"></td>
+				<td th:text="${(pageDto.nowPage-1)*(pageDto.numPerPage)+todoStatus.count}">번호</td>
+				<td th:text=${todo.content}>내용</td>
+				<td><button type="button" th:onclick="|javascript:deleteTodo('${todo.no}')|">삭제</button></td>
+			</tr>
+		</tbody>
+	</table>
+	<div>
+		<div th:if="${pageDto != null}">
+			<a th:if="${pageDto.prev}"
+			   th:href="@{/(nowPage=${pageDto.pageBarStart-1},search_text=${searchDto.search_text})}">
+			   &laquo;
+			</a>
+			<span th:each="num : ${#numbers.sequence(pageDto.pageBarStart, pageDto.pageBarEnd)}">
+			<a 
+			   th:text="${num}"
+			   th:href="@{/(nowPage=${num},search_text=${searchDto.search_text})}">
+			   번호
+			</a>
+			</span>
+			<a th:if="${pageDto.next}"
+			   th:href="@{/(nowPage=${pageDto.pageBarEnd+1}, search_text=${searchDto.search_text})}">
+			   &raquo;
+			</a>
+		</div>
+	</div>
+	
+	<hr>
+	
+	<h1>할 일 추가</h1>
+	<br>
+	<form name="create_todo_form">
+		<input name="content" type="text" placeholder="할일을 입력하세요.">
+		<button type="submit">추가하기</button>
+	</form>
+	
+	<script>
+		const form = document.create_todo_form;
+		form.addEventListener("submit", function(e) {
+			e.preventDefault();
+			if(form.content.value == '') {
+				alert("할일을 입력하세요.");
+			} else {
+				const payload = new FormData(form);
+				fetch('/', {
+					method : 'post',
+					body : payload
+				})
+				.then(response => response.json())
+				.then(data => {
+					alert(data.res_msg);
+					if(data.res_code == "200") {
+						location.reload();
+					} 
+				})
+				.catch(error => {
+					
+				})
+			}
+		})
+	
+		const changeFlag = function(id) {
+			fetch('/'+id, {
+				method : 'put'
+			})
+			.then(response => response.json())
+			.then(data => {
+				if(data.res_code == "500") {
+					alert(data.res_msg);
+				} 
+			})
+			.catch(error => {
+				
+			})
+		}
+		
+		const deleteTodo = function(id) {
+			if(confirm("정말 삭제하시겠습니까?")) {
+				fetch('/'+id, {
+					method : 'delete'
+				})
+				.then(response => response.json())
+				.then(data => {
+					alert(data.res_msg);
+					if(data.res_code == "200") {
+						location.reload();
+					} 
+				})
+				.catch(error => {
+					
+				})
+			}
+		}
+	</script>
+</body>
+</html>
