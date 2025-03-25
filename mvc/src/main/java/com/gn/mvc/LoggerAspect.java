@@ -18,7 +18,7 @@ public class LoggerAspect {
 	public void methodBefore(JoinPoint jp) {
 		String className = jp.getTarget().getClass().getName();
 		String methodName = jp.getSignature().getName();
-//		LOGGER.warn(className+"의 "+methodName+"실행 직전");
+//		LOGGER.warn(className+"의 "+methodName+"실행 직전"); 
 	}
 	
 }
