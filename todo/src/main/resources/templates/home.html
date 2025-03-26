@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>할 일</title>
 </head>
 <body>
 	<h1>할 일 목록</h1>
@@ -23,12 +23,12 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr th:if="${todos == null}">
+			<tr th:if="${#lists.isEmpty(todos)}">
 				<td colspan="4">조회된 데이터가 없습니다</td>
 			</tr>
-			<tr th:if="${todos != null}"
+			<tr th:if="${!#lists.isEmpty(todos)}"
 				th:each="todo, todoStatus : ${todos}">
-				<td><input type="checkbox" th:checked="${todo.flag == 'Y'}" th:onchange="|javascript:changeFlag('${todo.no}')|"></td>
+				<td><input type="checkbox" th:checked="${todo.flag == 'Y'}" th:value="${todo.flag}" th:onchange="|javascript:changeFlag('${todo.no}')|"></td>
 				<td th:text="${(pageDto.nowPage-1)*(pageDto.numPerPage)+todoStatus.count}">번호</td>
 				<td th:text=${todo.content}>내용</td>
 				<td><button type="button" th:onclick="|javascript:deleteTodo('${todo.no}')|">삭제</button></td>
@@ -36,7 +36,7 @@
 		</tbody>
 	</table>
 	<div>
-		<div th:if="${pageDto != null}">
+		<div th:if="${!#lists.isEmpty(todos)}">
 			<a th:if="${pageDto.prev}"
 			   th:href="@{/(nowPage=${pageDto.pageBarStart-1},search_text=${searchDto.search_text})}">
 			   &laquo;
@@ -91,7 +91,7 @@
 	
 		const changeFlag = function(id) {
 			fetch('/'+id, {
-				method : 'put'
+				method : 'put',
 			})
 			.then(response => response.json())
 			.then(data => {

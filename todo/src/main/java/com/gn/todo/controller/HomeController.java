@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.gn.todo.dto.PageDto;
 import com.gn.todo.dto.SearchDto;
+import com.gn.todo.dto.TodoDto;
 import com.gn.todo.entity.Todo;
 import com.gn.todo.service.HomeService;
 
@@ -26,21 +27,16 @@ public class HomeController {
 	
 	private final HomeService homeService;
 
-	@GetMapping("/")
+	@GetMapping({"","/"})
 	public String HomeView(Model model, SearchDto searchDto, PageDto pageDto) {
 		
 		if(pageDto.getNowPage() == 0) pageDto.setNowPage(1);
 		
-		Page<Todo> todos = homeService.selectTodoAll(searchDto, pageDto);
+		Page<TodoDto> todos = homeService.selectTodoAll(searchDto, pageDto);
 		
 		pageDto.setTotalPage(todos.getTotalPages());
 		
-		if(todos.isEmpty()) {
-			pageDto = null;
-			todos = null;
-		}
-		
-		model.addAttribute("todos",todos);
+		model.addAttribute("todos",todos.getContent());
 		model.addAttribute("searchDto", searchDto);
 		model.addAttribute("pageDto",pageDto);
 		
@@ -49,13 +45,13 @@ public class HomeController {
 	
 	@PostMapping("/")
 	@ResponseBody
-	public Map<String, String> createTodoApi(Model model,Todo todo) {
+	public Map<String, String> createTodoApi(Model model,TodoDto todoDto) {
 		
 		Map<String, String> resultMap = new HashMap<String, String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "할 일 추가 중 오류가 발생하였습니다. 다시 시도해주세요.");
 		
-		Todo result = homeService.createTodo(todo);
+		TodoDto result = homeService.createTodo(todoDto);
 		
 		if(result != null) {
 			resultMap.put("res_code", "200");

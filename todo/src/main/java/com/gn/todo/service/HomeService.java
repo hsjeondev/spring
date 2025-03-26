@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.gn.todo.dto.PageDto;
 import com.gn.todo.dto.SearchDto;
+import com.gn.todo.dto.TodoDto;
 import com.gn.todo.entity.Todo;
 import com.gn.todo.repository.HomeRepository;
 import com.gn.todo.specification.TodoSpecification;
@@ -20,39 +21,47 @@ public class HomeService {
 	
 	private final HomeRepository homeRepository;
 
-	public Page<Todo> selectTodoAll(SearchDto searchDto, PageDto pageDto) {
+	public Page<TodoDto> selectTodoAll(SearchDto searchDto, PageDto pageDto) {
 		
 		Pageable pageable = PageRequest.of(pageDto.getNowPage()-1, pageDto.getNumPerPage());
 		
 		Specification<Todo> spec = (root, query, criteriaBuilder) -> null;
-		if(searchDto.getSearch_text() == null) {
-			searchDto.setSearch_text("");
+		if(searchDto.getSearch_text() != null) {
+			spec = spec.and(TodoSpecification.TodoCotentContains(searchDto.getSearch_text()));			
 		}
-		spec = spec.and(TodoSpecification.TodoCotentContains(searchDto.getSearch_text()));
 		
-		Page<Todo> todos = homeRepository.findAll(spec, pageable);
+		Page<Todo> todoEntities = homeRepository.findAll(spec, pageable);
+		Page<TodoDto> todoDtos = todoEntities.map(todo -> {
+		    TodoDto todoDto = new TodoDto();
+		    return todoDto.toDto(todo);
+		});
 		
-		return todos;
+		return todoDtos;
 	}
 	
-	public Todo createTodo(Todo todo) {
-		todo.setFlag("N");
-		return homeRepository.save(todo);
+	public TodoDto createTodo(TodoDto todoDto) {
+		Todo todo = homeRepository.save(todoDto.toEntity());
+		return new TodoDto().toDto(todo);
 	}
 	
 	public int updateTodoFlagOne(Long id) {
 		int result = 0;
 		
 		try {
-			Todo todo = homeRepository.findById(id).orElse(null);
+			Todo todoEntity = homeRepository.findById(id).orElse(null);
+			TodoDto todoDto = new TodoDto().toDto(todoEntity);
 			
-			if(todo.getFlag().equals("N")) {
-				todo.setFlag("Y");
-			} else {
-				todo.setFlag("N");
+			if(todoEntity != null) {
+				if("N".equals(todoDto.getFlag())) {
+					todoDto.setFlag("Y");
+				} else {
+					todoDto.setFlag("N");
+				}
 			}
 			
-			homeRepository.save(todo);
+			todoEntity = todoDto.toEntity();
+			
+			homeRepository.save(todoEntity);
 			
 			result = 1;
 		}catch(Exception e) {
