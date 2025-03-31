@@ -30,7 +30,7 @@
 		fileForm.addEventListener("submit", function(e) {
 			e.preventDefault();
 			const filePayload = new FormData(fileForm);
-			fetch("/attach/create", {
+			fetch("/s3/upload", {
 				method : "post",
 				body : filePayload
 			})
