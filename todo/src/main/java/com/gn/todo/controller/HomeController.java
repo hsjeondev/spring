@@ -1,6 +1,7 @@
 package com.gn.todo.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
@@ -16,7 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.gn.todo.dto.PageDto;
 import com.gn.todo.dto.SearchDto;
 import com.gn.todo.dto.TodoDto;
-import com.gn.todo.entity.Todo;
+import com.gn.todo.entity.Attach;
+import com.gn.todo.service.AttachService;
 import com.gn.todo.service.HomeService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class HomeController {
 	
 	private final HomeService homeService;
+	private final AttachService attachService;
 
 	@GetMapping({"","/"})
 	public String HomeView(Model model, SearchDto searchDto, PageDto pageDto) {
@@ -33,6 +36,9 @@ public class HomeController {
 		if(pageDto.getNowPage() == 0) pageDto.setNowPage(1);
 		
 		Page<TodoDto> todos = homeService.selectTodoAll(searchDto, pageDto);
+		
+		List<Attach> attachList = attachService.selectAttachList();
+		model.addAttribute("attachList", attachList);
 		
 		pageDto.setTotalPage(todos.getTotalPages());
 		

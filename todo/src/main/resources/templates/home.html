@@ -5,6 +5,44 @@
 <title>할 일</title>
 </head>
 <body>
+	<h1>파일 목록</h1>
+	<form name="create_file_form">
+		<input type="file" name="files" multiple>
+		<input type="submit" value="업로드">
+	</form>
+	<br>
+	<table border="1" th:if="${!#lists.isEmpty(attachList)}">
+		<thead>
+			<tr>
+				<th>번호</th>
+				<th>다운로드</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="attach, attachStatus : ${attachList}">
+				<td th:text="${attachStatus.count}">번호(Status의 count사용)</td>
+				<td><a th:text="${attach.oriName}" th:onclick="|location.href='@{/download/{id}(id=${attach.attachNo})}'|">파일명</a></td>
+			</tr>
+		</tbody>
+	</table>
+	<script>
+		const fileForm = document.create_file_form;
+		fileForm.addEventListener("submit", function(e) {
+			e.preventDefault();
+			const filePayload = new FormData(fileForm);
+			fetch("/attach/create", {
+				method : "post",
+				body : filePayload
+			})
+			.then(resonse => response.json())
+			.then(data => {
+
+			})
+			.catch(error => {
+				
+			})
+		});
+	</script>
 	<h1>할 일 목록</h1>
 	<br>
 	<form action="/" name="search_todo_content_form" method="get">
