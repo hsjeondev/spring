@@ -34,7 +34,7 @@
 				method : "post",
 				body : filePayload
 			})
-			.then(resonse => response.json())
+			.then(response => response.json())
 			.then(data => {
 				if(data.res_code == "200") {
 					location.reload();
