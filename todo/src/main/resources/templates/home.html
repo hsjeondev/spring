@@ -37,7 +37,7 @@
 			.then(resonse => response.json())
 			.then(data => {
 				if(data.res_code == "200") {
-					location.href="/";
+					location.reload();
 				}
 			})
 			.catch(error => {
