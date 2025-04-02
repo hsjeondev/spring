@@ -78,8 +78,8 @@ public class AttachController {
 				
 			}
 			
-			resultMap.put("res_code", "500");
-			resultMap.put("res_msg", "파일 업로드중 오류가 발생하였습니다.");
+			resultMap.put("res_code", "200");
+			resultMap.put("res_msg", "파일 업로드 성공");
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
