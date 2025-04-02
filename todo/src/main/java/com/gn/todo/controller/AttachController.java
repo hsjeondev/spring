@@ -38,6 +38,8 @@ public class AttachController {
 	public ResponseEntity<Object> downloadFile(@PathVariable("id") Long id) {
 		System.out.println("ci/cd test1");
 		System.out.println("들여쓰기는 아니겠지...");
+		System.out.println("Jenkins");
+		
 		try {
 			Attach fileData = attachService.selectAttachOne(id);
 			if(fileData == null) {
