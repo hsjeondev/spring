@@ -14,7 +14,7 @@ jobs:
       # 저장소 소스코드 가져오기
       - name: Checkout Repository
         uses: actions/checkout@v3
-
+        
       - name: In EC2 Work
         uses: appleboy/ssh-action@master
         with:
@@ -41,4 +41,3 @@ jobs:
             # 6. jar 파일 복제 & 이미지 빌드 & 컨테이너 run
             sudo docker build -t my-app .
             sudo docker run -d --name my-app -p 8080:8080 my-app
-            
